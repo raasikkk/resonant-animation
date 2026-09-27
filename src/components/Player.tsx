@@ -32,7 +32,7 @@ export function Player({ open, onClose, audio }: { open: boolean; onClose: () =>
             <button className="icon-button" aria-label="Next track" onClick={() => audio.select(audio.track + 1)}><SkipForward size={20} /></button>
             <label className="volume-control"><Volume2 size={18} /><span className="sr-only">Volume</span><input aria-label="Volume" type="range" min="0" max="1" step="0.01" value={audio.volume} onChange={(event) => audio.changeVolume(Number(event.target.value))} /></label>
           </div>
-          <p className="player-note">Original generative sketches. Every session is a little different.</p>
+          <p className="player-note">Original generative sketches. Settle in. There’s no finish line.</p>
           {audio.error && <p role="alert" className="audio-error">{audio.error}</p>}
         </div>
       </div>

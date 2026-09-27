@@ -116,15 +116,15 @@ svg { flex-shrink: 0; }
 /* Three original sleeves, with physical vinyl behind each one. */
 .releases { position: relative; background: var(--paper); }
 .release-pin { padding: 112px var(--gutter) 28px; min-height: 100svh; }
-.releases-heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; }
-.releases-heading h2 { font-size: clamp(56px, 6.6vw, 105px); margin-top: 22px; line-height: .84; }
+.releases-heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 30px; }
+.releases-heading h2 { font-size: clamp(56px, 6vw, 96px); margin-top: 18px; line-height: .84; }
 .releases-heading .serif-word { font-size: .94em; }
 .releases-intro { display: flex; gap: 65px; align-items: flex-end; padding-bottom: 4px; }
 .releases-intro p { font-size: 14px; line-height: 1.5; }
 .releases-intro .eyebrow { display: flex; gap: 22px; align-items: center; }
 .release-window { overflow: visible; }
-.release-track { display: flex; gap: 5.5vw; width: max-content; padding-right: 8vw; }
-.release-card { width: clamp(340px, 36vw, 530px); flex-shrink: 0; }
+.release-track { position: relative; display: flex; gap: 5.5vw; width: max-content; padding-right: 8vw; }
+.release-card { width: clamp(290px, min(36vw, calc(100svh - 470px)), 530px); flex-shrink: 0; }
 .release-artwork { display: block; padding: 0; text-align: left; position: relative; width: 100%; isolation: isolate; }
 .record-art { aspect-ratio: 1; position: relative; padding: 6%; overflow: hidden; color: #20221d; width: 100%; box-shadow: 0 4px 7px #20221d13; }
 .record-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .2; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' filter='url(%23n)' opacity='.3' d='M0 0h150v150H0z'/%3E%3C/svg%3E"); }
@@ -149,12 +149,12 @@ svg { flex-shrink: 0; }
 .vinyl > div { position: absolute; inset: 32%; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; font-size: 10px; font-weight: 700; }
 .vinyl .brand-mark { width: 34px; height: 34px; }
 .release-artwork:hover .vinyl { right: -16%; }
-.release-info { display: flex; align-items: center; justify-content: space-between; padding: 21px 0; border-bottom: 1px solid var(--line); }
+.release-info { display: flex; align-items: center; justify-content: space-between; padding: 17px 0; border-bottom: 1px solid var(--line); }
 .release-info .eyebrow { font-size: 8px; }
 .release-info h3 { font-size: 17px; letter-spacing: -.03em; margin-top: 7px; font-weight: 700; }
 .release-info h3 > span { font-weight: 400; }
 .release-play { border: 1px solid var(--line); border-radius: 50%; }
-.release-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 32px; font-size: 8px; }
+.release-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; font-size: 8px; }
 .release-footer > span:last-child { display: flex; align-items: center; gap: 17px; }
 .release-scroll-track { height: 2px; width: 18%; background: #20221d22; }
 .release-scroll-track i { width: 100%; height: 100%; display: block; background: var(--orange); transform: scaleX(.08); transform-origin: left; }
@@ -262,8 +262,8 @@ svg { flex-shrink: 0; }
 @keyframes ticker-move { to { transform: translateX(-50%); } }
 @keyframes player-in { from { opacity: 0; transform: translateY(24px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-@media (min-width: 1600px) { .hero-main { height: 715px; } .release-card { width: min(36vw, 58vh); } }
-@media (min-width: 901px) and (max-height: 780px) { .hero-main { height: 500px; min-height: 450px; } .hero-title { font-size: min(17.5vw, 210px); } .frequency-title { font-size: min(10.7vw, 115px); } .release-card { width: min(36vw, 50vh); } .releases-heading { margin-bottom: 22px; } .releases-heading h2 { font-size: 60px; } .release-pin { padding-top: 105px; } }
+@media (min-width: 1600px) { .hero-main { height: 715px; } }
+@media (min-width: 901px) and (max-height: 780px) { .hero-main { height: 500px; min-height: 450px; } .hero-title { font-size: min(17.5vw, 200px); } .frequency-title { font-size: min(10.7vw, 115px); } .release-card { width: min(36vw, max(260px, calc(100svh - 430px))); } .releases-heading { margin-bottom: 22px; } .releases-heading h2 { font-size: 60px; } .release-pin { padding-top: 105px; } }
 
 @media (max-width: 1000px) {
   .navigation { gap: 20px; }
@@ -404,3 +404,4 @@ svg { flex-shrink: 0; }
   .art-open { transition: none; }
 }
 @media (prefers-reduced-motion: reduce) and (max-width: 700px) { .release-card { width: 94%; } .frequency-stage { min-height: 600px; } }
+@media (max-width: 370px) { .volume-control input { width: 55px; } .player-controls { gap: 4px; } .player-tracklist button { font-size: 10px; } }

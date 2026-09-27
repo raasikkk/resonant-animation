@@ -23,10 +23,39 @@ export function useChoreography(root: RefObject<HTMLDivElement | null>) {
 
       if (reduced) { count.textContent = '100'; return }
 
-      const lenis = new Lenis({ lerp: 0.085, smoothWheel: true, anchors: { offset: -82 }, stopInertiaOnNavigate: true })
+      const lenis = new Lenis({ lerp: 0.085, smoothWheel: true })
+      const cleanups: (() => void)[] = []
+      let active = true
       lenis.on('scroll', ScrollTrigger.update)
       const tick = (time: number) => lenis.raf(time * 1000)
       gsap.ticker.add(tick)
+
+      // Measure anchors after fonts and pin spacing settle. Lenis already reads
+      // CSS scroll-padding, so an additional header offset would count it twice.
+      const navigate = (event: MouseEvent) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+        const anchor = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]')
+        const href = anchor?.getAttribute('href')
+        const target = href ? document.getElementById(href.slice(1)) : null
+        if (!target) return
+        event.preventDefault()
+        void document.fonts.ready.then(() => {
+          if (!active) return
+          ScrollTrigger.refresh()
+          lenis.resize()
+          history.pushState(null, '', href)
+          const pinned = target.id === 'frequency' || (target.id === 'releases' && desktop)
+          const offset = pinned ? parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) : 0
+          lenis.scrollTo(target, { offset, duration: 1.25, easing: (t) => 1 - (1 - t) ** 4, onComplete: () => {
+            if (document.activeElement === anchor) {
+              target.setAttribute('tabindex', '-1')
+              target.focus({ preventScroll: true })
+            }
+          } })
+        })
+      }
+      element.addEventListener('click', navigate)
+      cleanups.push(() => element.removeEventListener('click', navigate))
 
       const intro = gsap.timeline({ defaults: { ease: 'power3.out' } })
       intro.from('.hero-title .line-mask > span', { yPercent: 115, rotation: 3, duration: 1.35, stagger: 0.12 }, 0.12)
@@ -56,6 +85,23 @@ export function useChoreography(root: RefObject<HTMLDivElement | null>) {
           .to('.release-scroll-track i', { scaleX: 1, duration: 1, ease: 'none' }, 0)
           .fromTo('.release-artwork .vinyl', { xPercent: 0, rotation: -45 }, { xPercent: 9, rotation: 35, duration: 1, ease: 'none' }, 0)
           .fromTo('.art-composition', { rotation: -12 }, { rotation: 12, duration: 1, ease: 'none' }, 0)
+
+        // Tab focus must bring off-screen records into the pinned viewport.
+        const revealFocusedRecord = (event: FocusEvent) => {
+          const target = event.target as HTMLElement
+          const card = target.closest<HTMLElement>('.release-card')
+          if (!card) return
+          const bounds = target.getBoundingClientRect()
+          const viewport = window.getBoundingClientRect()
+          if (bounds.left >= viewport.left && bounds.right <= viewport.right) return
+          const amount = distance()
+          const fraction = amount > 0 ? gsap.utils.clamp(0, 1, (card.offsetLeft + card.clientWidth / 2 - window.clientWidth / 2) / amount) : 0
+          const trigger = gallery.scrollTrigger!
+          lenis.scrollTo(trigger.start + fraction * (trigger.end - trigger.start), { immediate: true })
+          gallery.progress(fraction)
+        }
+        track.addEventListener('focusin', revealFocusedRecord)
+        cleanups.push(() => track.removeEventListener('focusin', revealFocusedRecord))
       } else {
         select('.release-card').forEach((card: HTMLElement) => {
           gsap.from(card, { y: 65, opacity: 0.15, rotation: 2, ease: 'none', scrollTrigger: { trigger: card, start: 'top 94%', end: 'top 50%', scrub: 0.4 } })
@@ -77,7 +123,7 @@ export function useChoreography(root: RefObject<HTMLDivElement | null>) {
       const dialogObserver = new MutationObserver(() => { if (dialog.open) lenis.stop(); else lenis.start() })
       dialogObserver.observe(dialog, { attributes: true, attributeFilter: ['open'] })
 
-      return () => { gsap.ticker.remove(tick); lenis.destroy(); dialogObserver.disconnect() }
+      return () => { active = false; cleanups.forEach((cleanup) => cleanup()); gsap.ticker.remove(tick); lenis.destroy(); dialogObserver.disconnect() }
     }, root)
 
     void document.fonts.ready.then(() => { if (alive) ScrollTrigger.refresh() })

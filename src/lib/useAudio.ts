@@ -66,9 +66,12 @@ class SoundEngine {
     this.delay.delayTime.value = (60 / release.bpm) * 0.75
     this.setVolume(volume)
     const schedule = () => {
+      // Background-tab throttling must never schedule a burst of overdue notes.
+      this.nextNote = Math.max(this.nextNote, this.context.currentTime + 0.01)
       while (this.nextNote < this.context.currentTime + 0.15) {
         const note = release.notes[this.step % release.notes.length]
-        this.tone(release.root * 2 ** (note / 12), this.nextNote, 1.6, 0.12, 'triangle')
+        const octave = Math.floor(this.step / 24) % 3 === 2 ? 2 : 1
+        this.tone(release.root * 2 ** (note / 12) * octave, this.nextNote, 1.6, 0.12, 'triangle')
         if (this.step % 4 === 0) this.tone(release.root / 2, this.nextNote, 2.7, 0.18)
         if (this.step % 8 === 0) {
           this.tone(release.root * 2, this.nextNote, 3.5, 0.045)
